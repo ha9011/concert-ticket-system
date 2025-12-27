@@ -1,0 +1,5 @@
+rootProject.name = 'concert-ticket-system-backend'
+
+include 'common-module'
+include 'api-server'
+include 'queue-server'
