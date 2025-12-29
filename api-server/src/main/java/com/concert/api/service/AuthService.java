@@ -3,6 +3,8 @@ package com.concert.api.service;
 import com.concert.api.repository.UserRepository;
 import com.concert.common.dto.SignupRequest;
 import com.concert.common.entity.User;
+import com.concert.common.exception.CustomException;
+import com.concert.common.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
@@ -23,11 +25,15 @@ public class AuthService {
 
     // 1. 인증번호 생성 및 TTL 설정 (중복 검사 포함)
     public String sendVerificationCode(String email) {
+        // 중복 여부
         if (userRepository.existsByEmail(email)) {
             throw new CustomException(ErrorCode.DUPLICATE_EMAIL);
         }
 
+        // 랜덤 코드 4자리
         String code = String.format("%04d", new Random().nextInt(10000));
+
+        // TTL 3분 설정
         redisTemplate.opsForValue().set(AUTH_PREFIX + email, code, 3, TimeUnit.MINUTES);
         
         return code;
@@ -45,7 +51,7 @@ public class AuthService {
         // 인증 성공 -> 회원 저장
         User newUser = User.builder()
                 .email(request.getEmail())
-                .password(request.getPassword()) // 실무에선 암호화 필수! (지금은 생략)
+                .password(request.getPassword())
                 .name(request.getName())
                 .build();
         
