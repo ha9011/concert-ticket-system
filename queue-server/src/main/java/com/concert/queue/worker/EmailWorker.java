@@ -13,7 +13,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 @Slf4j
-@Component
+//@Component
 @RequiredArgsConstructor
 public class EmailWorker implements CommandLineRunner {
 
