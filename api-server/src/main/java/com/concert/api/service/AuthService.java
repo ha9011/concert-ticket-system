@@ -1,6 +1,8 @@
 package com.concert.api.service;
 
 import com.concert.api.repository.UserRepository;
+import com.concert.common.dto.LoginRequest;
+import com.concert.common.dto.SessionUser;
 import com.concert.common.dto.SignupRequest;
 import com.concert.common.entity.User;
 import com.concert.common.exception.CustomException;
@@ -37,6 +39,25 @@ public class AuthService {
         redisTemplate.opsForValue().set(AUTH_PREFIX + email, code, 3, TimeUnit.MINUTES);
         
         return code;
+    }
+
+    /**
+     * 로그인 처리
+     * @param request 로그인 정보 (이메일, 비밀번호)
+     * @return 세션에 저장할 유저 정보
+     */
+    public SessionUser login(LoginRequest request) {
+        // 1. 이메일로 유저 조회
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        // 2. 비밀번호 확인 (⚠️ 현재는 평문 비교, 보안상 암호화 필수!)
+        if (!user.getPassword().equals(request.getPassword())) {
+            throw new CustomException(ErrorCode.INVALID_PASSWORD);
+        }
+
+        // 3. 세션용 DTO 반환
+        return new SessionUser(user);
     }
 
     // 2. 인증번호 검증 및 회원가입 처리

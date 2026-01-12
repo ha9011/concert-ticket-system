@@ -15,3 +15,8 @@ spring:
     redis:
       host: localhost
       port: 6379
+  session:
+    store-type: redis            # 세션 데이터를 외부 저장소인 Redis에 저장하도록 설정
+    redis:
+      namespace: concert:session # Redis 내부에서 세션 데이터임을 식별하는 키 접두사 (네임스페이스)
+    timeout: 30m                 # 사용자가 활동이 없을 때 세션이 유지되는 시간 (기본 30분)

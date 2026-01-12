@@ -54,6 +54,7 @@ project(':common-module') {
 project(':api-server') {
     dependencies {
         implementation project(':common-module')
+        implementation 'org.springframework.session:spring-session-data-redis'
     }
 }
 
