@@ -21,3 +21,6 @@ mysql_data/
 # Spring Boot
 out/
 gen/
+
+# Claude Code 로컬 설정
+.claude/
