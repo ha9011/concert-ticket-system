@@ -15,7 +15,7 @@
 
 ---
 
-### 패턴 1: 인증 코드 저장 (String + TTL)
+### - [x] 패턴 1: 인증 코드 저장 (String + TTL)
 
 **무엇을 했는가**
 
@@ -80,7 +80,7 @@ redisTemplate.delete("auth:" + email);
 
 ---
 
-### 패턴 2: 이메일 큐 (List — Producer/Consumer)
+### - [x] 패턴 2: 이메일 큐 (List — Producer/Consumer)
 
 **무엇을 했는가**
 
@@ -164,7 +164,7 @@ LPUSH로 삽입 →  [C] [B] [A]  → RPOP으로 꺼냄
 
 ---
 
-### 패턴 3: 세션 저장소 (Spring Session + Redis)
+### - [x] 패턴 3: 세션 저장소 (Spring Session + Redis)
 
 **무엇을 했는가**
 
@@ -268,7 +268,7 @@ redis-cli로 확인:
 
 ## Phase 1 — 도메인 확장 + Cache-Aside
 
-### Unit 1: Concert/Seat 도메인 구축
+### - [ ] Unit 1: Concert/Seat 도메인 구축
 
 **학습 목표**
 - 콘서트 예매의 핵심 도메인(공연, 좌석)을 JPA 엔티티로 모델링한다.
@@ -293,7 +293,7 @@ redis-cli로 확인:
 
 ---
 
-### Unit 2: Cache-Aside 패턴
+### - [ ] Unit 2: Cache-Aside 패턴
 
 **학습 목표**
 - 가장 보편적인 캐시 패턴인 Cache-Aside(Lazy Loading)를 이해하고 구현한다.
@@ -336,7 +336,7 @@ TTL:     5분 (학습용으로 짧게)
 
 ## Phase 2 — 동시성 제어 (분산 락)
 
-### Unit 3: SETNX 기반 분산 락 (직접 구현)
+### - [ ] Unit 3: SETNX 기반 분산 락 (직접 구현)
 
 **학습 목표**
 - 동시 좌석 예매 시 발생하는 동시성 문제를 이해한다.
@@ -380,7 +380,7 @@ TTL:     5초 (데드락 방지)
 
 ---
 
-### Unit 4: Redisson 분산 락
+### - [ ] Unit 4: Redisson 분산 락
 
 **학습 목표**
 - 프로덕션 레벨 분산 락 라이브러리인 Redisson을 사용한다.
@@ -427,7 +427,7 @@ try {
 
 ## Phase 3 — 대기열 + Rate Limiting
 
-### Unit 5: Sorted Set 대기열
+### - [ ] Unit 5: Sorted Set 대기열
 
 **학습 목표**
 - Redis Sorted Set을 활용한 대기열(Waiting Queue)을 구현한다.
@@ -470,7 +470,7 @@ try {
 
 ---
 
-### Unit 6: Rate Limiting (Sliding Window)
+### - [ ] Unit 6: Rate Limiting (Sliding Window)
 
 **학습 목표**
 - API 호출 빈도를 제한하는 Rate Limiting을 Redis로 구현한다.
@@ -515,7 +515,7 @@ try {
 
 ## Phase 4 — Pub/Sub, Lua Script, 운영
 
-### Unit 7: Pub/Sub + Lua Script
+### - [ ] Unit 7: Pub/Sub + Lua Script
 
 **학습 목표**
 - Redis Pub/Sub를 이용한 실시간 이벤트 전파를 구현한다.
@@ -567,7 +567,7 @@ return 0  -- 거부
 
 ---
 
-### Unit 8: 운영 지식 종합
+### - [ ] Unit 8: 운영 지식 종합
 
 **학습 목표**
 - Redis를 프로덕션에서 운영할 때 알아야 할 핵심 개념을 정리한다.
