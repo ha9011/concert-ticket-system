@@ -15,6 +15,18 @@
 
 ---
 
+## Redis 자료구조 학습 진행 (redis-quests/)
+
+`redis-quests/{자료구조}/` 폴더 기반의 자료구조별 학습 자료 진행 상황. 각 폴더는 실습·요약·실무·시나리오·면접질문 세트로 구성.
+
+- [x] String — `redis-quests/01-string/`
+- [ ] List — `redis-quests/02-list/`
+- [ ] Set — `redis-quests/03-set/`
+- [ ] Sorted Set — `redis-quests/04-sorted-set/`
+- [ ] Hash — `redis-quests/05-hash/`
+
+---
+
 ### - [x] 패턴 1: 인증 코드 저장 (String + TTL)
 
 **무엇을 했는가**
