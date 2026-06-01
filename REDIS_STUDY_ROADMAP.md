@@ -8,18 +8,18 @@
 
 ## 현재 상태
 
-- ✅ 완료: 4개 (패턴 1, 2, 3 + String 자료구조 학습)
-- 🟡 진행 중: 0개
+- ✅ 완료: 3개 (구현 패턴 1, 2, 3)
+- 🟡 진행 중: 1개 (String 자료구조 학습 — 실습·요약·실무·부록 완료 / 시나리오·면접질문 남음)
 - ⬜ 예정: 12개 (자료구조 4 + Phase 1~4 Unit 8)
 
-**다음 추천**: List 자료구조 학습 (`redis-quests/02-list/`)
+**다음 추천**: String 마무리 — `redis-quests/01-string/03-시나리오.md` (10 케이스 풀이)
 
 ---
 
 ## 학습 진행
 
 ### 자료구조 학습 (redis-quests/)
-- [x] String — `redis-quests/01-string/` — 완료 2026-05-28
+- [ ] String — `redis-quests/01-string/` (진행 중 — 시나리오·면접질문 남음)
 - [ ] List — `redis-quests/02-list/`
 - [ ] Set — `redis-quests/03-set/`
 - [ ] Sorted Set — `redis-quests/04-sorted-set/`
@@ -50,18 +50,22 @@
 
 ## 학습 노트
 
-### String 자료구조 학습 완료
+### String 자료구조 학습 (진행 중)
 
-- **완료일**: 2026-05-28
-- **무엇을**: `redis-quests/01-string/` 학습 5종(실습·요약·실무·시나리오·면접질문) + 부록 4종(Lua·멱등성·Rate Limit·분산락) 완성
-- **핵심 통찰**:
+- **완료일**: (진행 중 — 2026-05-28 기준)
+- **무엇을**: `redis-quests/01-string/` 학습 자료 중 실습(76문항)·요약·실무·부록 4종 완료. 시나리오·면접질문 남음.
+- **진행 상태**:
+  - ✅ [실습](redis-quests/01-string/01-실습.md) — 76문항 풀이 완료 (인코딩 섹션 스킵)
+  - ✅ [요약](redis-quests/01-string/01-요약.md) — 완료
+  - ✅ [실무](redis-quests/01-string/02-실무.md) — 완료 (5대 패턴 + Cache Stampede 심화 + Redisson 실전)
+  - ✅ 부록 4종 — [Lua 스크립트](redis-quests/01-string/부록-lua-스크립트.md) · [멱등성](redis-quests/01-string/부록-멱등성.md) · [Rate Limit](redis-quests/01-string/부록-rate-limit.md) · [분산락](redis-quests/01-string/부록-분산락.md)
+  - ⬜ [시나리오](redis-quests/01-string/03-시나리오.md) — **다음 학습 대상** (10 케이스, 보스급 1 + 라이트 9)
+  - ⬜ [면접질문](redis-quests/01-string/03-면접질문.md) — 시나리오 후 진행 (31문항)
+- **핵심 통찰** (지금까지의 깨달음):
   - `SET k v NX EX` 조합이 분산 시스템 활용의 절반 (Cache-Aside / 인증 코드 / 멱등성 / 분산락 모두 동일 패턴)
   - "확인 후 처리(check-and-act)" 패턴엔 Lua 스크립트로 원자화 필수 (트랜잭션 MULTI/EXEC로는 조건 분기 불가)
   - Cache Stampede / 분산락 / 멱등성 / Rate Limit 모두 표준 패턴 존재 — 실무는 대부분 Redisson 또는 Redis 1-liner로 해결
   - 분산락의 4중 안전망(NX + TTL + Watchdog + owner 검증)을 Redisson `lock.lock()` 한 줄이 자동 처리
-- **참고**:
-  - 학습 자료: [실습](redis-quests/01-string/01-실습.md) · [요약](redis-quests/01-string/01-요약.md) · [실무](redis-quests/01-string/02-실무.md) · [시나리오](redis-quests/01-string/03-시나리오.md) · [면접질문](redis-quests/01-string/03-면접질문.md)
-  - 부록: [Lua 스크립트](redis-quests/01-string/부록-lua-스크립트.md) · [멱등성](redis-quests/01-string/부록-멱등성.md) · [Rate Limit](redis-quests/01-string/부록-rate-limit.md) · [분산락](redis-quests/01-string/부록-분산락.md)
 
 ---
 
@@ -348,9 +352,9 @@ redis-cli로 확인:
 
 ## 다음 학습 후보
 
-1. **List 자료구조 학습** (`redis-quests/02-list/`) — String과 같은 5종 세트(실습·요약·실무·시나리오·면접질문) + 부록으로 진행. 메시지 큐 / FIFO / Reliable Queue 패턴 이해. **자료구조 완주 흐름 유지가 학습 동력에 가장 유리**.
-2. **Phase 1 Unit 1: Concert/Seat 도메인 구축** — 실전 구현 시작점. JPA 엔티티 + REST API. Cache-Aside 적용 전 도메인 기반 마련.
-3. **Phase 1 Unit 2: Cache-Aside 패턴** — 이미 이론([부록-멱등성](redis-quests/01-string/부록-멱등성.md), [02-실무.md §1 Cache Stampede 심화](redis-quests/01-string/02-실무.md))으로 학습한 내용을 실제 코드로 옮길 단계. 분산락+Stampede+Jitter+TTL 한 번에 체득.
+1. **String 03-시나리오.md** (`redis-quests/01-string/03-시나리오.md`) — 10개 실전 케이스(보스급 1 + 라이트 9). 지금까지 학습한 실무 패턴이 시나리오 형태로 어떻게 적용되는지 점검. **String 마무리 단계**.
+2. **String 03-면접질문.md** (`redis-quests/01-string/03-면접질문.md`) — 단답형 31문항. 이론·자료구조·명령어비교·동시성·운영·함정 영역 정리. 시나리오 끝낸 직후 진행하면 머리에 남음.
+3. **List 자료구조 학습** (`redis-quests/02-list/`) — String 완료 후 진입. 메시지 큐 / FIFO / Reliable Queue 패턴. 자료구조 완주 흐름 유지.
 
 ---
 
