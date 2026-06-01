@@ -1,33 +1,81 @@
 # Redis 학습 로드맵 — 콘서트 티켓 시스템
 
-> 이 프로젝트에서 이미 구현한 3가지 패턴(String+TTL, List Queue, Session Store)을 기반으로,
-> 실무에서 자주 쓰이는 Redis 패턴을 단계적으로 익혀 나가는 로드맵입니다.
+> 콘서트 티켓 시스템 프로젝트를 통해 실무에서 자주 쓰이는 Redis 패턴을 단계적으로 익히는 학습 로드맵.
+
+마지막 갱신: 2026-05-28
 
 ---
 
-## 현재 완료된 패턴
+## 현재 상태
 
-| 패턴 | Redis 자료구조 | 키 예시 | 위치 |
-|------|---------------|---------|------|
-| 인증 코드 저장 | String + TTL | `auth:{email}` | api-server |
-| 이메일 큐 | List (LPUSH/RPOP) | `mail:queue` | api-server ↔ queue-server |
-| 세션 저장소 | Spring Session + Hash | `concert:session:{id}` | api-server |
+- ✅ 완료: 4개 (패턴 1, 2, 3 + String 자료구조 학습)
+- 🟡 진행 중: 0개
+- ⬜ 예정: 12개 (자료구조 4 + Phase 1~4 Unit 8)
+
+**다음 추천**: List 자료구조 학습 (`redis-quests/02-list/`)
 
 ---
 
-## Redis 자료구조 학습 진행 (redis-quests/)
+## 학습 진행
 
-`redis-quests/{자료구조}/` 폴더 기반의 자료구조별 학습 자료 진행 상황. 각 폴더는 실습·요약·실무·시나리오·면접질문 세트로 구성.
-
-- [x] String — `redis-quests/01-string/`
+### 자료구조 학습 (redis-quests/)
+- [x] String — `redis-quests/01-string/` — 완료 2026-05-28
 - [ ] List — `redis-quests/02-list/`
 - [ ] Set — `redis-quests/03-set/`
 - [ ] Sorted Set — `redis-quests/04-sorted-set/`
 - [ ] Hash — `redis-quests/05-hash/`
 
+### 구현 패턴 (현재 프로젝트에 통합 완료)
+- [x] 패턴 1: 인증 코드 저장 (String + TTL)
+- [x] 패턴 2: 이메일 큐 (List Producer/Consumer)
+- [x] 패턴 3: 세션 저장소 (Spring Session + Redis)
+
+### Phase 1 — 도메인 확장 + Cache-Aside
+- [ ] Unit 1: Concert/Seat 도메인 구축
+- [ ] Unit 2: Cache-Aside 패턴
+
+### Phase 2 — 동시성 제어 (분산 락)
+- [ ] Unit 3: SETNX 기반 분산 락 (직접 구현)
+- [ ] Unit 4: Redisson 분산 락
+
+### Phase 3 — 대기열 + Rate Limiting
+- [ ] Unit 5: Sorted Set 대기열
+- [ ] Unit 6: Rate Limiting (Sliding Window)
+
+### Phase 4 — Pub/Sub, Lua Script, 운영
+- [ ] Unit 7: Pub/Sub + Lua Script
+- [ ] Unit 8: 운영 지식 종합
+
 ---
 
-### - [x] 패턴 1: 인증 코드 저장 (String + TTL)
+## 학습 노트
+
+### String 자료구조 학습 완료
+
+- **완료일**: 2026-05-28
+- **무엇을**: `redis-quests/01-string/` 학습 5종(실습·요약·실무·시나리오·면접질문) + 부록 4종(Lua·멱등성·Rate Limit·분산락) 완성
+- **핵심 통찰**:
+  - `SET k v NX EX` 조합이 분산 시스템 활용의 절반 (Cache-Aside / 인증 코드 / 멱등성 / 분산락 모두 동일 패턴)
+  - "확인 후 처리(check-and-act)" 패턴엔 Lua 스크립트로 원자화 필수 (트랜잭션 MULTI/EXEC로는 조건 분기 불가)
+  - Cache Stampede / 분산락 / 멱등성 / Rate Limit 모두 표준 패턴 존재 — 실무는 대부분 Redisson 또는 Redis 1-liner로 해결
+  - 분산락의 4중 안전망(NX + TTL + Watchdog + owner 검증)을 Redisson `lock.lock()` 한 줄이 자동 처리
+- **참고**:
+  - 학습 자료: [실습](redis-quests/01-string/01-실습.md) · [요약](redis-quests/01-string/01-요약.md) · [실무](redis-quests/01-string/02-실무.md) · [시나리오](redis-quests/01-string/03-시나리오.md) · [면접질문](redis-quests/01-string/03-면접질문.md)
+  - 부록: [Lua 스크립트](redis-quests/01-string/부록-lua-스크립트.md) · [멱등성](redis-quests/01-string/부록-멱등성.md) · [Rate Limit](redis-quests/01-string/부록-rate-limit.md) · [분산락](redis-quests/01-string/부록-분산락.md)
+
+---
+
+### 패턴 1: 인증 코드 저장 (String + TTL)
+
+- **완료일**: 초기 구현 단계 (프로젝트 셋업 시점)
+- **무엇을**: 이메일 회원가입 시 4자리 인증번호를 Redis String + TTL 3분으로 관리, 검증 성공 시 즉시 DEL
+- **핵심 통찰**:
+  - 자동 만료가 필요한 임시 데이터엔 Redis TTL이 최적 (DB 스케줄러 불필요)
+  - String 타입은 단순 Key-Value 1:1 매핑에 적합
+  - 인증 후 즉시 DEL로 중복 가입 방지 (TTL 만료 기다리지 않음)
+- **참고**: `AuthService.java` · 보안 강화 방향은 [부록-멱등성.md](redis-quests/01-string/부록-멱등성.md) / [부록-rate-limit.md](redis-quests/01-string/부록-rate-limit.md)
+
+#### 상세 가이드
 
 **무엇을 했는가**
 
@@ -92,7 +140,17 @@ redisTemplate.delete("auth:" + email);
 
 ---
 
-### - [x] 패턴 2: 이메일 큐 (List — Producer/Consumer)
+### 패턴 2: 이메일 큐 (List — Producer/Consumer)
+
+- **완료일**: 초기 구현 단계
+- **무엇을**: 회원가입 후 환영 이메일을 비동기 처리. api-server가 Redis List에 LPUSH, queue-server가 BRPOP으로 꺼내 워커 풀에서 병렬 처리
+- **핵심 통찰**:
+  - LPUSH + RPOP 조합으로 FIFO 큐 자연스럽게 구현
+  - BRPOP(블로킹)으로 폴링 CPU 낭비 제거
+  - Dispatcher 단일 + Worker Pool 다중 패턴으로 throughput 확보
+- **참고**: `EmailMultiWorker.java`, `AuthService.java` · 멱등성·중복 차단은 [부록-멱등성.md](redis-quests/01-string/부록-멱등성.md)
+
+#### 상세 가이드
 
 **무엇을 했는가**
 
@@ -176,7 +234,17 @@ LPUSH로 삽입 →  [C] [B] [A]  → RPOP으로 꺼냄
 
 ---
 
-### - [x] 패턴 3: 세션 저장소 (Spring Session + Redis)
+### 패턴 3: 세션 저장소 (Spring Session + Redis)
+
+- **완료일**: 초기 구현 단계
+- **무엇을**: 로그인 세션을 WAS 메모리가 아닌 Redis Hash에 저장. Spring Session 설정만으로 투명하게 처리, 로그아웃 시 즉시 무효화
+- **핵심 통찰**:
+  - WAS 메모리 세션은 재시작 시 모두 소실 → Redis로 옮기면 무중단 + 서버 간 공유 가능
+  - Spring Session은 표준 Servlet API 그대로 사용 (코드 변경 없이 설정만)
+  - SessionUser는 Serializable 필수 (Java 직렬화 기반)
+- **참고**: `AuthController.java`, `SessionUser.java`, `application.yml` · 보안 강화는 [부록-멱등성.md](redis-quests/01-string/부록-멱등성.md)
+
+#### 상세 가이드
 
 **무엇을 했는가**
 
@@ -278,9 +346,21 @@ redis-cli로 확인:
 
 ---
 
-## Phase 1 — 도메인 확장 + Cache-Aside
+## 다음 학습 후보
 
-### - [ ] Unit 1: Concert/Seat 도메인 구축
+1. **List 자료구조 학습** (`redis-quests/02-list/`) — String과 같은 5종 세트(실습·요약·실무·시나리오·면접질문) + 부록으로 진행. 메시지 큐 / FIFO / Reliable Queue 패턴 이해. **자료구조 완주 흐름 유지가 학습 동력에 가장 유리**.
+2. **Phase 1 Unit 1: Concert/Seat 도메인 구축** — 실전 구현 시작점. JPA 엔티티 + REST API. Cache-Aside 적용 전 도메인 기반 마련.
+3. **Phase 1 Unit 2: Cache-Aside 패턴** — 이미 이론([부록-멱등성](redis-quests/01-string/부록-멱등성.md), [02-실무.md §1 Cache Stampede 심화](redis-quests/01-string/02-실무.md))으로 학습한 내용을 실제 코드로 옮길 단계. 분산락+Stampede+Jitter+TTL 한 번에 체득.
+
+---
+
+## 커리큘럼 (예정 항목 상세)
+
+> Phase 1~4 Unit 1~8의 상세 학습 가이드. 각 Unit 진행 시 참고.
+
+### Phase 1 — 도메인 확장 + Cache-Aside
+
+#### Unit 1: Concert/Seat 도메인 구축
 
 **학습 목표**
 - 콘서트 예매의 핵심 도메인(공연, 좌석)을 JPA 엔티티로 모델링한다.
@@ -305,7 +385,7 @@ redis-cli로 확인:
 
 ---
 
-### - [ ] Unit 2: Cache-Aside 패턴
+#### Unit 2: Cache-Aside 패턴
 
 **학습 목표**
 - 가장 보편적인 캐시 패턴인 Cache-Aside(Lazy Loading)를 이해하고 구현한다.
@@ -346,9 +426,9 @@ TTL:     5분 (학습용으로 짧게)
 
 ---
 
-## Phase 2 — 동시성 제어 (분산 락)
+### Phase 2 — 동시성 제어 (분산 락)
 
-### - [ ] Unit 3: SETNX 기반 분산 락 (직접 구현)
+#### Unit 3: SETNX 기반 분산 락 (직접 구현)
 
 **학습 목표**
 - 동시 좌석 예매 시 발생하는 동시성 문제를 이해한다.
@@ -392,7 +472,7 @@ TTL:     5초 (데드락 방지)
 
 ---
 
-### - [ ] Unit 4: Redisson 분산 락
+#### Unit 4: Redisson 분산 락
 
 **학습 목표**
 - 프로덕션 레벨 분산 락 라이브러리인 Redisson을 사용한다.
@@ -437,9 +517,9 @@ try {
 
 ---
 
-## Phase 3 — 대기열 + Rate Limiting
+### Phase 3 — 대기열 + Rate Limiting
 
-### - [ ] Unit 5: Sorted Set 대기열
+#### Unit 5: Sorted Set 대기열
 
 **학습 목표**
 - Redis Sorted Set을 활용한 대기열(Waiting Queue)을 구현한다.
@@ -482,7 +562,7 @@ try {
 
 ---
 
-### - [ ] Unit 6: Rate Limiting (Sliding Window)
+#### Unit 6: Rate Limiting (Sliding Window)
 
 **학습 목표**
 - API 호출 빈도를 제한하는 Rate Limiting을 Redis로 구현한다.
@@ -525,9 +605,9 @@ try {
 
 ---
 
-## Phase 4 — Pub/Sub, Lua Script, 운영
+### Phase 4 — Pub/Sub, Lua Script, 운영
 
-### - [ ] Unit 7: Pub/Sub + Lua Script
+#### Unit 7: Pub/Sub + Lua Script
 
 **학습 목표**
 - Redis Pub/Sub를 이용한 실시간 이벤트 전파를 구현한다.
@@ -579,7 +659,7 @@ return 0  -- 거부
 
 ---
 
-### - [ ] Unit 8: 운영 지식 종합
+#### Unit 8: 운영 지식 종합
 
 **학습 목표**
 - Redis를 프로덕션에서 운영할 때 알아야 할 핵심 개념을 정리한다.
@@ -605,6 +685,27 @@ return 0  -- 거부
 - Redis 설정 변경 후 동작 확인
 - 장애 시나리오 시뮬레이션: Master 종료 → Sentinel 페일오버 관찰
 - 전체 프로젝트의 Redis 키를 정리하고 네이밍 컨벤션 준수 여부 점검
+
+---
+
+## 참고 자료
+
+### 학습 산출물 (이 프로젝트)
+- [redis-quests/01-string/](redis-quests/01-string/) — String 학습 자료 5종 + 부록 4종
+  - [부록-lua-스크립트.md](redis-quests/01-string/부록-lua-스크립트.md) — Lua 개념·KEYS/ARGV·실전 패턴 5종
+  - [부록-멱등성.md](redis-quests/01-string/부록-멱등성.md) — Idempotency Key·상태 머신·응답 재생
+  - [부록-rate-limit.md](redis-quests/01-string/부록-rate-limit.md) — Fixed Window·다층 RL·Sliding Window
+  - [부록-분산락.md](redis-quests/01-string/부록-분산락.md) — 락키 vs owner·Stale Lock Release·Watchdog·4중 안전망
+
+### 외부 자료
+- Redis 공식 문서 (redis.io/docs) — 명령어 레퍼런스
+- 우아한형제들 기술 블로그 — Redisson 분산 락, 선착순 이벤트
+- NHN FORWARD "Redis 야무지게 사용하기" — 실무 팁
+- 강대명 『이것이 레디스다』 — 한국어 입문서
+- Manning 『Redis in Action』 — 패턴별 실습
+- Redis University (university.redis.com) — 공식 무료 강의
+
+→ 부록 D에 면접 질문·학습 순서 추천 등 추가 안내.
 
 ---
 
@@ -735,6 +836,8 @@ ZREVRANGE recent:user:42 0 9   → 최근 10개 (시간 역순)
 | **쓰는 곳** | 토스/카카오페이 결제 중복 방지, 주문 중복 생성 방지, API 멱등성 보장 |
 | **왜 Redis?** | 클라이언트가 보낸 `Idempotency-Key`를 Redis에 `SETNX`로 저장한다. 이미 존재하면 중복 요청이므로 이전 응답을 반환. TTL로 일정 시간 후 자동 정리. |
 | **핵심 명령어** | `SET idempotency:{key} {response} EX 86400 NX` — 24시간 TTL로 중복 차단<br>존재하면 → 이전 응답 반환, 없으면 → 요청 처리 후 저장 |
+
+> 자세한 흐름·상태 머신·`requestHash`는 [부록-멱등성.md](redis-quests/01-string/부록-멱등성.md) 참고.
 
 #### 8. 기능 플래그 (Feature Flag)
 
