@@ -2,25 +2,25 @@
 
 > 콘서트 티켓 시스템 프로젝트를 통해 실무에서 자주 쓰이는 Redis 패턴을 단계적으로 익히는 학습 로드맵.
 
-마지막 갱신: 2026-05-28
+마지막 갱신: 2026-06-11
 
 ---
 
 ## 현재 상태
 
-- ✅ 완료: 3개 (구현 패턴 1, 2, 3)
-- 🟡 진행 중: 1개 (String 자료구조 학습 — 실습·요약·실무·부록 완료 / 시나리오·면접질문 남음)
-- ⬜ 예정: 12개 (자료구조 4 + Phase 1~4 Unit 8)
+- ✅ 완료: 4개 (구현 패턴 1, 2, 3 + String 자료구조 학습)
+- 🟢 자료 완성, 학습 대기: 1개 (List 자료구조 — 실습·요약·실무·시나리오·면접질문 5종 완성)
+- ⬜ 예정: 11개 (자료구조 3 + Phase 1~4 Unit 8)
 
-**다음 추천**: String 마무리 — `redis-quests/01-string/03-시나리오.md` (10 케이스 풀이)
+**다음 추천**: List 학습 시작 — `redis-quests/02-list/01-실습.md` (74문항 드릴) → 요약 → 실무(Reliable Queue) → 시나리오 → 면접질문
 
 ---
 
 ## 학습 진행
 
 ### 자료구조 학습 (redis-quests/)
-- [ ] String — `redis-quests/01-string/` (진행 중 — 시나리오·면접질문 남음)
-- [ ] List — `redis-quests/02-list/`
+- [x] String — `redis-quests/01-string/` (완료 — 실습·요약·실무·시나리오·면접질문 + 부록 4종)
+- [~] List — `redis-quests/02-list/` (학습 자료 5종 완성, 학습 대기)
 - [ ] Set — `redis-quests/03-set/`
 - [ ] Sorted Set — `redis-quests/04-sorted-set/`
 - [ ] Hash — `redis-quests/05-hash/`
@@ -50,18 +50,34 @@
 
 ## 학습 노트
 
-### String 자료구조 학습 (진행 중)
+### List 자료구조 학습 (자료 완성, 학습 대기)
 
-- **완료일**: (진행 중 — 2026-05-28 기준)
-- **무엇을**: `redis-quests/01-string/` 학습 자료 중 실습(76문항)·요약·실무·부록 4종 완료. 시나리오·면접질문 남음.
+- **자료 완성일**: 2026-06-11
+- **무엇을**: `redis-quests/02-list/` 학습 자료 5종 생성. String과 동일 포맷(실습→요약→실무→시나리오→면접질문).
+- **진행 상태**:
+  - ✅ [실습](redis-quests/02-list/01-실습.md) — 74문항 드릴 (방향/큐스택/키생명주기/블로킹/원자적이동/Reliable Queue 미션)
+  - ✅ [요약](redis-quests/02-list/01-요약.md) — 개념 정리 (quicklist/listpack, 큐 패턴 8종)
+  - ✅ [실무](redis-quests/02-list/02-실무.md) — 메시지 큐 / Reliable Queue / DLQ / 최근목록 / Fan-out / 우선순위 큐
+  - ✅ [시나리오](redis-quests/02-list/03-시나리오.md) — 10 케이스 (보스급=큐 컨슈머 사망 메시지 유실 + 라이트 9)
+  - ✅ [면접질문](redis-quests/02-list/03-면접질문.md) — 33문항 (A~G: 구조·명령어비교·큐패턴·신뢰성·브로커비교·운영함정·실전)
+- **이 프로젝트 직결 포인트** (학습 시 집중):
+  - `mail:queue`는 List다. Producer `AuthService.java:85`(LPUSH) + Consumer `EmailMultiWorker.java:44`(BRPOP) = FIFO.
+  - **현재 단순 큐는 메시지 유실 위험** — BRPOP으로 꺼낸 순간 소멸, 워커 죽으면 끝. `EmailWorker.java:72` 주석의 "DLQ/별도 처리 필요"가 정확히 이 문제.
+  - **핵심 개선 = Reliable Queue**: `BLMOVE 큐 처리중` → 작업 → `LREM`. 워커 죽어도 processing 리스트로 복구. 단 재처리 대비 컨슈머 멱등성(dedup) 의무.
+  - 내구성이 더 필요하면 List 수동 구현보다 **Redis Stream**(컨슈머그룹·ack·재처리 내장)이 정석 — 이름은 알아둘 것.
+
+### String 자료구조 학습 (완료)
+
+- **완료일**: 2026-06-11
+- **무엇을**: `redis-quests/01-string/` 학습 자료 5종 + 부록 4종 완료.
 - **진행 상태**:
   - ✅ [실습](redis-quests/01-string/01-실습.md) — 76문항 풀이 완료 (인코딩 섹션 스킵)
   - ✅ [요약](redis-quests/01-string/01-요약.md) — 완료
   - ✅ [실무](redis-quests/01-string/02-실무.md) — 완료 (5대 패턴 + Cache Stampede 심화 + Redisson 실전)
+  - ✅ [시나리오](redis-quests/01-string/03-시나리오.md) — 완료 (10 케이스, 보스급 1 + 라이트 9)
+  - ✅ [면접질문](redis-quests/01-string/03-면접질문.md) — 완료 (33문항, 운영 심화 G 포함)
   - ✅ 부록 4종 — [Lua 스크립트](redis-quests/01-string/부록-lua-스크립트.md) · [멱등성](redis-quests/01-string/부록-멱등성.md) · [Rate Limit](redis-quests/01-string/부록-rate-limit.md) · [분산락](redis-quests/01-string/부록-분산락.md)
-  - ⬜ [시나리오](redis-quests/01-string/03-시나리오.md) — **다음 학습 대상** (10 케이스, 보스급 1 + 라이트 9)
-  - ⬜ [면접질문](redis-quests/01-string/03-면접질문.md) — 시나리오 후 진행 (31문항)
-- **핵심 통찰** (지금까지의 깨달음):
+- **핵심 통찰**:
   - `SET k v NX EX` 조합이 분산 시스템 활용의 절반 (Cache-Aside / 인증 코드 / 멱등성 / 분산락 모두 동일 패턴)
   - "확인 후 처리(check-and-act)" 패턴엔 Lua 스크립트로 원자화 필수 (트랜잭션 MULTI/EXEC로는 조건 분기 불가)
   - Cache Stampede / 분산락 / 멱등성 / Rate Limit 모두 표준 패턴 존재 — 실무는 대부분 Redisson 또는 Redis 1-liner로 해결
