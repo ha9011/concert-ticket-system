@@ -2,17 +2,17 @@
 
 > 콘서트 티켓 시스템 프로젝트를 통해 실무에서 자주 쓰이는 Redis 패턴을 단계적으로 익히는 학습 로드맵.
 
-마지막 갱신: 2026-06-12
+마지막 갱신: 2026-06-15
 
 ---
 
 ## 현재 상태
 
 - ✅ 완료: 4개 (구현 패턴 1, 2, 3 + String 자료구조 학습)
-- 🟡 진행 중: 1개 (List 자료구조 — 실습 완료, 요약·실무·시나리오·면접질문 학습 중)
+- 🟡 진행 중: 1개 (List 자료구조 — 실습·요약·실무 완료, 시나리오·면접질문 학습 중)
 - ⬜ 예정: 11개 (자료구조 3 + Phase 1~4 Unit 8)
 
-**다음 추천**: List 이어서 — `redis-quests/02-list/01-요약.md` (개념 정리) → 실무(Reliable Queue) → 시나리오 → 면접질문
+**다음 추천**: List 이어서 — `redis-quests/02-list/03-시나리오.md` (10 실전 케이스) → 면접질문
 
 ---
 
@@ -20,7 +20,7 @@
 
 ### 자료구조 학습 (redis-quests/)
 - [x] String — `redis-quests/01-string/` (완료 — 실습·요약·실무·시나리오·면접질문 + 부록 4종)
-- [~] List — `redis-quests/02-list/` (진행 중 — 실습 완료, 요약·실무·시나리오·면접질문 남음)
+- [~] List — `redis-quests/02-list/` (진행 중 — 실습·요약·실무 완료, 시나리오·면접질문 남음)
 - [ ] Set — `redis-quests/03-set/`
 - [ ] Sorted Set — `redis-quests/04-sorted-set/`
 - [ ] Hash — `redis-quests/05-hash/`
@@ -56,15 +56,19 @@
 - **무엇을**: `redis-quests/02-list/` 학습 자료 5종. String과 동일 포맷(실습→요약→실무→시나리오→면접질문).
 - **진행 상태**:
   - ✅ [실습](redis-quests/02-list/01-실습.md) — **학습 완료 (2026-06-12)**. 74문항 드릴(방향/큐스택/키생명주기/블로킹/원자적이동/Reliable Queue 미션). 직접 푼 Q1~Q18(함정 6개 포함) 전부 정답, Q19~Q52 채점·해설 완료.
-  - ⬜ [요약](redis-quests/02-list/01-요약.md) — **다음 학습 대상** (quicklist/listpack, 큐 패턴 8종)
-  - ⬜ [실무](redis-quests/02-list/02-실무.md) — 메시지 큐 / Reliable Queue / DLQ / 최근목록 / Fan-out / 우선순위 큐
-  - ⬜ [시나리오](redis-quests/02-list/03-시나리오.md) — 10 케이스 (보스급=큐 컨슈머 사망 메시지 유실 + 라이트 9)
+  - ✅ [요약](redis-quests/02-list/01-요약.md) — **학습 완료 (2026-06-15)** (quicklist/listpack 인코딩, 큐 패턴 8종)
+  - ✅ [실무](redis-quests/02-list/02-실무.md) — **학습 완료 (2026-06-15)** (메시지 큐 / Reliable Queue / DLQ / 최근목록 / Fan-out / 우선순위 큐 / 배치소비 + List vs Kafka/RabbitMQ/Stream)
+  - ⬜ [시나리오](redis-quests/02-list/03-시나리오.md) — **다음 학습 대상** (10 케이스, 보스급=큐 컨슈머 사망 메시지 유실 + 라이트 9)
   - ⬜ [면접질문](redis-quests/02-list/03-면접질문.md) — 33문항 (A~G: 구조·명령어비교·큐패턴·신뢰성·브로커비교·운영함정·실전)
 - **실습 핵심 통찰** (직접 풀며 잡은 것):
   - **방향이 전부** — LPUSH+RPOP(방향 반대)=FIFO, LPUSH+LPOP(같은 쪽)=LIFO. `mail:queue`가 FIFO인 이유.
   - **빈 컬렉션 = 키 소멸** — List/Set/Hash/ZSet 공통. 그래서 큐 감시는 `EXISTS`가 아니라 `LLEN`으로.
   - **LREM 부호** = head(양수)/tail(음수)부터 제거 → "어느 쪽이 살아남나"로 기억.
   - **블로킹** BRPOP은 (큐이름,값) 쌍 반환, `timeout 0`=무한대기, 여러 키=우선순위 큐(단 starvation 주의).
+- **실무 핵심 통찰** (02-실무.md):
+  - **단순 큐 = at-most-once** — BRPOP은 꺼내는 순간 소멸 → 워커 사망 시 유실. **Reliable Queue(BLMOVE→작업→LREM)** 로 at-least-once 격상, 단 재처리 대비 **컨슈머 멱등성(dedup) 의무**.
+  - **신뢰성 큐는 Stream이 정석** — List로 손코딩하면 컨슈머그룹·ack·재처리를 어설프게 재발명하는 꼴. 규모/내구성 필요하면 Redis Stream(XACK·PEL·XCLAIM 내장).
+  - **패턴별 자료구조 매칭** — 최근 N개=LPUSH+LTRIM(capped), Fan-out=팔로워별 List에 LPUSH, 우선순위=BRPOP 다중키. 큐 적체 감시는 `LLEN` + 임계값 알림.
 - **이 프로젝트 직결 포인트** (학습 시 집중):
   - `mail:queue`는 List다. Producer `AuthService.java:85`(LPUSH) + Consumer `EmailMultiWorker.java:44`(BRPOP) = FIFO.
   - **현재 단순 큐는 메시지 유실 위험** — BRPOP으로 꺼낸 순간 소멸, 워커 죽으면 끝. `EmailWorker.java:72` 주석의 "DLQ/별도 처리 필요"가 정확히 이 문제.
@@ -373,9 +377,9 @@ redis-cli로 확인:
 
 ## 다음 학습 후보
 
-1. **List 01-요약.md** (`redis-quests/02-list/01-요약.md`) — 실습으로 손에 익힌 명령어를 개념으로 정리(quicklist/listpack 인코딩, 큐 패턴 8종). 실습 직후라 머리에 잘 붙는 단계. **List 진행 1순위**.
-2. **List 02-실무.md** (`redis-quests/02-list/02-실무.md`) — 메시지 큐 / Reliable Queue / DLQ / 최근목록 / Fan-out / 우선순위 큐. 이 프로젝트 `mail:queue` 유실 개선과 직결.
-3. **List 03-시나리오.md → 03-면접질문.md** — 10 실전 케이스(보스급=컨슈머 사망 유실) + 단답 33문항으로 List 마무리. 끝나면 Set(`03-set/`)로 진입.
+1. **List 03-시나리오.md** (`redis-quests/02-list/03-시나리오.md`) — 10 실전 케이스(보스급=컨슈머 사망 유실 + 라이트 9). 실습·요약·실무에서 익힌 패턴이 장애 시나리오로 어떻게 나타나는지 점검. **List 진행 1순위**.
+2. **List 03-면접질문.md** (`redis-quests/02-list/03-면접질문.md`) — 단답 33문항(A기본·B명령어·C큐패턴·D신뢰성·E브로커비교·F운영함정·G실전). 시나리오 직후 진행하면 List 마무리. 끝나면 Set(`03-set/`)로 진입.
+3. **프로젝트 코드 미션 — mail:queue를 Reliable Queue로** — `EmailMultiWorker`의 BRPOP을 BLMOVE+processing+LREM+reaper로 격상 (02-실무.md 미션 / 03-시나리오 시나리오1). 학습한 Reliable Queue를 실제 코드로 적용.
 
 ---
 
