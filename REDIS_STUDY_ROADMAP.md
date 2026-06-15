@@ -8,11 +8,11 @@
 
 ## 현재 상태
 
-- ✅ 완료: 4개 (구현 패턴 1, 2, 3 + String 자료구조 학습)
-- 🟡 진행 중: 1개 (List 자료구조 — 실습·요약·실무 완료, 시나리오·면접질문 학습 중)
-- ⬜ 예정: 11개 (자료구조 3 + Phase 1~4 Unit 8)
+- ✅ 완료: 5개 (구현 패턴 1, 2, 3 + String·List 자료구조 학습)
+- 🟢 자료 완성, 학습 대기: 1개 (Set 자료구조 — 실습·요약·실무·시나리오·면접질문 5종 완성)
+- ⬜ 예정: 10개 (자료구조 2 + Phase 1~4 Unit 8)
 
-**다음 추천**: List 이어서 — `redis-quests/02-list/03-시나리오.md` (10 실전 케이스) → 면접질문
+**다음 추천**: Set 학습 시작 — `redis-quests/03-set/01-실습.md` (72문항 드릴) → 요약 → 실무 → 시나리오 → 면접질문
 
 ---
 
@@ -20,8 +20,8 @@
 
 ### 자료구조 학습 (redis-quests/)
 - [x] String — `redis-quests/01-string/` (완료 — 실습·요약·실무·시나리오·면접질문 + 부록 4종)
-- [~] List — `redis-quests/02-list/` (진행 중 — 실습·요약·실무 완료, 시나리오·면접질문 남음)
-- [ ] Set — `redis-quests/03-set/`
+- [x] List — `redis-quests/02-list/` (완료 — 실습·요약·실무·시나리오·면접질문 5종)
+- [~] Set — `redis-quests/03-set/` (학습 자료 5종 완성, 학습 대기)
 - [ ] Sorted Set — `redis-quests/04-sorted-set/`
 - [ ] Hash — `redis-quests/05-hash/`
 
@@ -50,16 +50,33 @@
 
 ## 학습 노트
 
-### List 자료구조 학습 (진행 중)
+### Set 자료구조 학습 (자료 완성, 학습 대기)
 
-- **자료 완성일**: 2026-06-11 · **학습 시작**: 2026-06-12
+- **자료 완성일**: 2026-06-15
+- **무엇을**: `redis-quests/03-set/` 학습 자료 5종 생성. String/List와 동일 포맷(실습→요약→실무→시나리오→면접질문).
+- **진행 상태**:
+  - ⬜ [실습](redis-quests/03-set/01-실습.md) — 72문항 드릴 (SADD/멤버십/랜덤차이/집합연산/키생명주기/찜·공통관심사 미션)
+  - ⬜ [요약](redis-quests/03-set/01-요약.md) — 개념 정리 (intset/listpack/hashtable, 집합연산, Set vs Bitmap vs HyperLogLog)
+  - ⬜ [실무](redis-quests/03-set/02-실무.md) — 중복방지 / 멤버십 / 태그 / 공통관심사·추천 / 추첨 / 출석·유니크카운트 / 알림대상
+  - ⬜ [시나리오](redis-quests/03-set/03-시나리오.md) — 10 케이스 (보스급=공통관심사 SINTER 성능 저하 + 라이트 9)
+  - ⬜ [면접질문](redis-quests/03-set/03-면접질문.md) — 33문항 (A~G: 구조·명령어·집합연산·인코딩·카운트비교·운영함정·실전)
+- **이 프로젝트 직결 포인트** (학습 시 집중):
+  - **찜한 아티스트 = Set** (`favorite:user:{id}`). `SADD` 반환값(1/0)으로 중복 찜 차단.
+  - **공통 관심사 = SINTER** / **추천 = SDIFF** (협업 필터링 기초). 개수만이면 SINTERCARD.
+  - **알림 대상 = Set → List Fan-out** ("대상 선정은 Set, 전달은 List"). List 챕터와 직결.
+  - **핵심 함정**: SPOP(제거) vs SRANDMEMBER(유지), 양수(중복X)/음수(중복O) count, SMEMBERS=big key 블로킹, 큰 집합 연산 비용.
+  - **유니크 카운트 3총사**: 목록·정확=Set / 정수ID=Bitmap / 대규모 근사=HyperLogLog.
+
+### List 자료구조 학습 (완료)
+
+- **자료 완성일**: 2026-06-11 · **학습 시작**: 2026-06-12 · **완주**: 2026-06-15
 - **무엇을**: `redis-quests/02-list/` 학습 자료 5종. String과 동일 포맷(실습→요약→실무→시나리오→면접질문).
 - **진행 상태**:
   - ✅ [실습](redis-quests/02-list/01-실습.md) — **학습 완료 (2026-06-12)**. 74문항 드릴(방향/큐스택/키생명주기/블로킹/원자적이동/Reliable Queue 미션). 직접 푼 Q1~Q18(함정 6개 포함) 전부 정답, Q19~Q52 채점·해설 완료.
   - ✅ [요약](redis-quests/02-list/01-요약.md) — **학습 완료 (2026-06-15)** (quicklist/listpack 인코딩, 큐 패턴 8종)
   - ✅ [실무](redis-quests/02-list/02-실무.md) — **학습 완료 (2026-06-15)** (메시지 큐 / Reliable Queue / DLQ / 최근목록 / Fan-out / 우선순위 큐 / 배치소비 + List vs Kafka/RabbitMQ/Stream)
-  - ⬜ [시나리오](redis-quests/02-list/03-시나리오.md) — **다음 학습 대상** (10 케이스, 보스급=큐 컨슈머 사망 메시지 유실 + 라이트 9)
-  - ⬜ [면접질문](redis-quests/02-list/03-면접질문.md) — 33문항 (A~G: 구조·명령어비교·큐패턴·신뢰성·브로커비교·운영함정·실전)
+  - ✅ [시나리오](redis-quests/02-list/03-시나리오.md) — **학습 완료 (2026-06-15)** (10 케이스, 보스급=큐 컨슈머 사망 메시지 유실→BLMOVE+processing+reaper + 라이트 9)
+  - ✅ [면접질문](redis-quests/02-list/03-면접질문.md) — **학습 완료 (2026-06-15)** (33문항, A~G: 구조·명령어비교·큐패턴·신뢰성·브로커비교·운영함정·실전)
 - **실습 핵심 통찰** (직접 풀며 잡은 것):
   - **방향이 전부** — LPUSH+RPOP(방향 반대)=FIFO, LPUSH+LPOP(같은 쪽)=LIFO. `mail:queue`가 FIFO인 이유.
   - **빈 컬렉션 = 키 소멸** — List/Set/Hash/ZSet 공통. 그래서 큐 감시는 `EXISTS`가 아니라 `LLEN`으로.
@@ -377,9 +394,9 @@ redis-cli로 확인:
 
 ## 다음 학습 후보
 
-1. **List 03-시나리오.md** (`redis-quests/02-list/03-시나리오.md`) — 10 실전 케이스(보스급=컨슈머 사망 유실 + 라이트 9). 실습·요약·실무에서 익힌 패턴이 장애 시나리오로 어떻게 나타나는지 점검. **List 진행 1순위**.
-2. **List 03-면접질문.md** (`redis-quests/02-list/03-면접질문.md`) — 단답 33문항(A기본·B명령어·C큐패턴·D신뢰성·E브로커비교·F운영함정·G실전). 시나리오 직후 진행하면 List 마무리. 끝나면 Set(`03-set/`)로 진입.
-3. **프로젝트 코드 미션 — mail:queue를 Reliable Queue로** — `EmailMultiWorker`의 BRPOP을 BLMOVE+processing+LREM+reaper로 격상 (02-실무.md 미션 / 03-시나리오 시나리오1). 학습한 Reliable Queue를 실제 코드로 적용.
+1. **Set 01-실습.md** (`redis-quests/03-set/01-실습.md`) — 자료 5종 완성. 72문항 드릴부터 → 요약 → 실무 → 시나리오 → 면접질문. **다음 진행 1순위.** 실습 후 함정 위주 채점.
+2. **[복습 예정] mail:queue를 Reliable Queue로** — `EmailMultiWorker`의 BRPOP을 BLMOVE+processing+LREM+reaper로 격상 + 멱등성 (02-list/02-실무.md 미션 / 03-시나리오 시나리오1). 배운 걸 손으로 만드는 코드 미션. (todo로 보관 — 복습 때 진행)
+3. **Sorted Set(ZSet) 자료구조** (`redis-quests/04-sorted-set/`) — Set 완주 후 다음. 랭킹·대기열·우선순위·가중추첨. (자료 미생성 — 생성부터 필요)
 
 ---
 
@@ -720,11 +737,14 @@ return 0  -- 거부
 ## 참고 자료
 
 ### 학습 산출물 (이 프로젝트)
+- [MESSAGING_TOOL_GUIDE.md](MESSAGING_TOOL_GUIDE.md) — **작업 종류별 도구 선택 가이드** (Redis vs Kafka vs RabbitMQ vs DB). Queue/Log 모델·의사결정 트리·결제 분업 예시. 각 개념은 String/List 학습 자료로 링크.
 - [redis-quests/01-string/](redis-quests/01-string/) — String 학습 자료 5종 + 부록 4종
   - [부록-lua-스크립트.md](redis-quests/01-string/부록-lua-스크립트.md) — Lua 개념·KEYS/ARGV·실전 패턴 5종
   - [부록-멱등성.md](redis-quests/01-string/부록-멱등성.md) — Idempotency Key·상태 머신·응답 재생
   - [부록-rate-limit.md](redis-quests/01-string/부록-rate-limit.md) — Fixed Window·다층 RL·Sliding Window
   - [부록-분산락.md](redis-quests/01-string/부록-분산락.md) — 락키 vs owner·Stale Lock Release·Watchdog·4중 안전망
+- [redis-quests/02-list/](redis-quests/02-list/) — List 학습 자료 5종 (실습·요약·실무·시나리오·면접질문)
+- [redis-quests/03-set/](redis-quests/03-set/) — Set 학습 자료 5종 (실습·요약·실무·시나리오·면접질문)
 
 ### 외부 자료
 - Redis 공식 문서 (redis.io/docs) — 명령어 레퍼런스
