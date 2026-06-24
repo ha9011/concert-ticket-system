@@ -3,6 +3,9 @@
 > 콘서트 티켓 시스템 프로젝트에서 Redis를 자료구조 단위로 깊게 학습한다.
 > 각 자료구조 폴더는 **실습 → 실무 → 면접** 순으로 구성.
 
+> 공통 기준: Redis를 단독 저장소로 둘지, DB와 함께 둘지 헷갈리면
+> 먼저 [Redis와 DB 저장 기준](00-redis-db-저장기준.md)을 본다.
+
 ## 진행도
 
 | 챕터 | 자료구조 | 실습 | 실무 | 면접 | 상태 |
@@ -37,5 +40,6 @@ redis-cli -p 6379 MONITOR
 
 ## 참고
 
+- Redis와 DB 저장 기준: [00-redis-db-저장기준.md](00-redis-db-저장기준.md)
 - 전체 로드맵: [REDIS_STUDY_ROADMAP.md](../REDIS_STUDY_ROADMAP.md)
 - 프로젝트 가이드: [CLAUDE.md](../CLAUDE.md)
