@@ -2,17 +2,17 @@
 
 > 콘서트 티켓 시스템 프로젝트를 통해 실무에서 자주 쓰이는 Redis 패턴을 단계적으로 익히는 학습 로드맵.
 
-마지막 갱신: 2026-06-15
+마지막 갱신: 2026-06-24
 
 ---
 
 ## 현재 상태
 
-- ✅ 완료: 5개 (구현 패턴 1, 2, 3 + String·List 자료구조 학습)
-- 🟢 자료 완성, 학습 대기: 1개 (Set 자료구조 — 실습·요약·실무·시나리오·면접질문 5종 완성)
-- ⬜ 예정: 10개 (자료구조 2 + Phase 1~4 Unit 8)
+- ✅ 완료: 6개 (구현 패턴 1, 2, 3 + String·List·Set 자료구조 학습)
+- 🟢 자료 완성, 학습 대기: 1개 (Sorted Set 자료구조 — 실습·요약·실무·시나리오·면접질문 5종 완성)
+- ⬜ 예정: 9개 (자료구조 1 Hash + Phase 1~4 Unit 8)
 
-**다음 추천**: Set 학습 시작 — `redis-quests/03-set/01-실습.md` (72문항 드릴) → 요약 → 실무 → 시나리오 → 면접질문
+**다음 추천**: ZSet 학습 시작 — `redis-quests/04-sorted-set/01-실습.md` (72문항 드릴) → 요약 → 실무 → 시나리오 → 면접질문
 
 ---
 
@@ -21,8 +21,8 @@
 ### 자료구조 학습 (redis-quests/)
 - [x] String — `redis-quests/01-string/` (완료 — 실습·요약·실무·시나리오·면접질문 + 부록 4종)
 - [x] List — `redis-quests/02-list/` (완료 — 실습·요약·실무·시나리오·면접질문 5종)
-- [~] Set — `redis-quests/03-set/` (학습 자료 5종 완성, 학습 대기)
-- [ ] Sorted Set — `redis-quests/04-sorted-set/`
+- [x] Set — `redis-quests/03-set/` (완료 — 실습·요약·실무·시나리오·면접질문 5종)
+- [~] Sorted Set — `redis-quests/04-sorted-set/` (학습 자료 5종 완성, 학습 대기)
 - [ ] Hash — `redis-quests/05-hash/`
 
 ### 구현 패턴 (현재 프로젝트에 통합 완료)
@@ -50,16 +50,43 @@
 
 ## 학습 노트
 
-### Set 자료구조 학습 (자료 완성, 학습 대기)
+### Sorted Set(ZSet) 자료구조 학습 (자료 완성, 학습 대기)
 
-- **자료 완성일**: 2026-06-15
-- **무엇을**: `redis-quests/03-set/` 학습 자료 5종 생성. String/List와 동일 포맷(실습→요약→실무→시나리오→면접질문).
+- **자료 완성일**: 2026-06-24
+- **무엇을**: `redis-quests/04-sorted-set/` 학습 자료 5종 생성. String/List/Set과 동일 포맷(실습→요약→실무→시나리오→면접질문).
 - **진행 상태**:
-  - ⬜ [실습](redis-quests/03-set/01-실습.md) — 72문항 드릴 (SADD/멤버십/랜덤차이/집합연산/키생명주기/찜·공통관심사 미션)
-  - ⬜ [요약](redis-quests/03-set/01-요약.md) — 개념 정리 (intset/listpack/hashtable, 집합연산, Set vs Bitmap vs HyperLogLog)
-  - ⬜ [실무](redis-quests/03-set/02-실무.md) — 중복방지 / 멤버십 / 태그 / 공통관심사·추천 / 추첨 / 출석·유니크카운트 / 알림대상
-  - ⬜ [시나리오](redis-quests/03-set/03-시나리오.md) — 10 케이스 (보스급=공통관심사 SINTER 성능 저하 + 라이트 9)
-  - ⬜ [면접질문](redis-quests/03-set/03-면접질문.md) — 33문항 (A~G: 구조·명령어·집합연산·인코딩·카운트비교·운영함정·실전)
+  - ⬜ [실습](redis-quests/04-sorted-set/01-실습.md) — 72문항 드릴 (ZADD 옵션/ZRANGE 3축/랭킹/POP/집합연산 score합산/대기열·리더보드·RateLimit 미션)
+  - ⬜ [요약](redis-quests/04-sorted-set/01-요약.md) — 개념 정리 (score 정렬, ZRANGE 3축, 동점 사전순, listpack/skiplist, WEIGHTS/AGGREGATE)
+  - ⬜ [실무](redis-quests/04-sorted-set/02-실무.md) — 리더보드 / 대기열 / 우선순위 큐 / Rate Limit / 지연 큐 / 가중 추첨 / 최근목록·만료
+  - ⬜ [시나리오](redis-quests/04-sorted-set/03-시나리오.md) — 10 케이스 (보스급=선착순 티켓 대기열 폭주 + 라이트 9)
+  - ⬜ [면접질문](redis-quests/04-sorted-set/03-면접질문.md) — 33문항 (A~G: 구조·명령어·랭킹·대기열/RateLimit·집합연산·인코딩·실전)
+- **이 프로젝트 직결 포인트** (학습 시 집중):
+  - **선착순 대기열 = ZSet** (`queue:concert:{id}`, score=진입시각). `ZRANK`=순번, `ZRANGE+ZREMRANGEBYRANK`(또는 ZPOPMIN N)=통과. **로드맵 Phase 3 Unit 5 사전 준비.**
+  - **Rate Limit = Sliding Window Log** (score=요청시각, `ZREMRANGEBYSCORE`+`ZCARD`, Lua 원자화). **Phase 3 Unit 6 + Phase 4 Lua 직결.**
+  - **가중 추첨** — Set SPOP의 균등 한계를 score=누적 가중치로 해결 (Set 챕터 추첨의 연결).
+  - **시간을 score로** = 대기열·Rate Limit·지연 큐·멤버 만료가 한 자료구조로.
+  - **핵심 함정 4종**: score=double 정밀도(2^53), 동점=사전순, 큰 ZRANGE 블로킹, 멤버 개별 TTL 없음.
+  - 휘발성이라 내구성·감사는 DB/로그 병행 ([00-redis-db-저장기준.md](redis-quests/00-redis-db-저장기준.md)).
+
+### Set 자료구조 학습 (완료)
+
+- **자료 완성일**: 2026-06-15 · **학습 시작**: 2026-06-22 · **완주**: 2026-06-24
+- **무엇을**: `redis-quests/03-set/` 학습 자료 5종. String/List와 동일 포맷(실습→요약→실무→시나리오→면접질문).
+- **진행 상태**:
+  - ✅ [실습](redis-quests/03-set/01-실습.md) — **학습 완료 (2026-06-22)**. 72문항 드릴. 직접 푼 함정 7개(Q2/4/6/16/25/28/32) 전부 정답, Q19(SINTER 교집합) pop 누락 1건 → 교집합은 공통 원소 전부.
+  - ✅ [요약](redis-quests/03-set/01-요약.md) — **학습 완료 (2026-06-22)** (intset/listpack/hashtable 인코딩, 집합연산, Set vs Bitmap vs HyperLogLog)
+  - ✅ [실무](redis-quests/03-set/02-실무.md) — **학습 완료 (2026-06-24)** (중복방지 / 멤버십 / 태그 / 공통관심사·추천 / 추첨 / 출석·유니크카운트 / 알림대상). 사용자가 직접 보강(DB 원본+Redis 보조인덱스 관점 등).
+  - ✅ [시나리오](redis-quests/03-set/03-시나리오.md) — **학습 완료 (2026-06-24)** (10 케이스, 보스급=공통관심사 SINTER 성능 저하 + 라이트 9)
+  - ✅ [면접질문](redis-quests/03-set/03-면접질문.md) — **학습 완료 (2026-06-24)** (33문항, A~G: 구조·명령어·집합연산·인코딩·카운트비교·운영함정·실전)
+- **실습 핵심 통찰** (직접 풀며 잡은 것):
+  - **SADD 반환값(1/0)** = 중복 방지 + "이미 했나" 판단 (찜·좋아요·투표 1회 제한).
+  - **SISMEMBER O(1)** = Set 존재 이유. List는 값 검색(LPOS)이 양끝 무관 O(N).
+  - **SPOP(꺼내며 제거) vs SRANDMEMBER(보기만)**, 양수 count(중복X) vs 음수(중복O).
+  - **교집합(SINTER)은 공통 원소 *전부*** — 하나 찾고 멈추지 않기 (Q19 교훈).
+- **실무·시나리오 핵심 통찰** (사용자 보강 반영):
+  - **Set은 보조 인덱스, 영구 진실은 DB** — 찜/권한/응모는 DB가 원본(UNIQUE 최종 방어), Set은 빠른 멤버십·집합연산용. 찜 = **DB 먼저 저장 → Redis 갱신**, 취소 = DB DELETE 후 양방향 SREM. 판단 기준: [00-redis-db-저장기준.md](redis-quests/00-redis-db-저장기준.md).
+  - **큰 SINTER는 단일 스레드를 오래 잡는다** (보스급) — SINTERCARD(개수+LIMIT)·STORE(캐싱)·후보 좁히기·배치로 hot path에서 큰 연산 제거.
+  - **유니크 카운트 정밀 표현** — HLL=약 0.81% 표준오차·최대 약 12KB, Bitmap=촘촘한 정수 ID일 때, SPOP=완전 균등 분포 보장 아님(감사 필요 추첨은 DB 기록).
 - **이 프로젝트 직결 포인트** (학습 시 집중):
   - **찜한 아티스트 = Set** (`favorite:user:{id}`). `SADD` 반환값(1/0)으로 중복 찜 차단.
   - **공통 관심사 = SINTER** / **추천 = SDIFF** (협업 필터링 기초). 개수만이면 SINTERCARD.
@@ -394,9 +421,9 @@ redis-cli로 확인:
 
 ## 다음 학습 후보
 
-1. **Set 01-실습.md** (`redis-quests/03-set/01-실습.md`) — 자료 5종 완성. 72문항 드릴부터 → 요약 → 실무 → 시나리오 → 면접질문. **다음 진행 1순위.** 실습 후 함정 위주 채점.
-2. **[복습 예정] mail:queue를 Reliable Queue로** — `EmailMultiWorker`의 BRPOP을 BLMOVE+processing+LREM+reaper로 격상 + 멱등성 (02-list/02-실무.md 미션 / 03-시나리오 시나리오1). 배운 걸 손으로 만드는 코드 미션. (todo로 보관 — 복습 때 진행)
-3. **Sorted Set(ZSet) 자료구조** (`redis-quests/04-sorted-set/`) — Set 완주 후 다음. 랭킹·대기열·우선순위·가중추첨. (자료 미생성 — 생성부터 필요)
+1. **ZSet 01-실습.md** (`redis-quests/04-sorted-set/01-실습.md`) — 자료 5종 완성. 72문항 드릴부터 → 요약 → 실무 → 시나리오 → 면접질문. **다음 진행 1순위.** 실습 후 함정 위주 채점.
+2. **Hash 자료구조** (`redis-quests/05-hash/`) — ZSet 완주 후 마지막 자료구조. 필드-값 묶음(객체 저장). (자료 미생성 — 생성부터 필요)
+3. **[복습 예정] mail:queue를 Reliable Queue로** — `EmailMultiWorker`의 BRPOP을 BLMOVE+processing+LREM+reaper로 격상 + 멱등성 (02-list/02-실무.md 미션 / 03-시나리오 시나리오1). 배운 걸 손으로 만드는 코드 미션. (todo로 보관 — 복습 때 진행)
 
 ---
 
@@ -738,6 +765,7 @@ return 0  -- 거부
 
 ### 학습 산출물 (이 프로젝트)
 - [MESSAGING_TOOL_GUIDE.md](MESSAGING_TOOL_GUIDE.md) — **작업 종류별 도구 선택 가이드** (Redis vs Kafka vs RabbitMQ vs DB). Queue/Log 모델·의사결정 트리·결제 분업 예시. 각 개념은 String/List 학습 자료로 링크.
+- [redis-quests/00-redis-db-저장기준.md](redis-quests/00-redis-db-저장기준.md) — **Redis vs DB 저장 판단 기준** (사용자 작성). "영구 진실은 DB, Redis는 보조/캐시" 원칙. Set 실무(찜=DB먼저)와 직결.
 - [redis-quests/01-string/](redis-quests/01-string/) — String 학습 자료 5종 + 부록 4종
   - [부록-lua-스크립트.md](redis-quests/01-string/부록-lua-스크립트.md) — Lua 개념·KEYS/ARGV·실전 패턴 5종
   - [부록-멱등성.md](redis-quests/01-string/부록-멱등성.md) — Idempotency Key·상태 머신·응답 재생
@@ -745,6 +773,7 @@ return 0  -- 거부
   - [부록-분산락.md](redis-quests/01-string/부록-분산락.md) — 락키 vs owner·Stale Lock Release·Watchdog·4중 안전망
 - [redis-quests/02-list/](redis-quests/02-list/) — List 학습 자료 5종 (실습·요약·실무·시나리오·면접질문)
 - [redis-quests/03-set/](redis-quests/03-set/) — Set 학습 자료 5종 (실습·요약·실무·시나리오·면접질문)
+- [redis-quests/04-sorted-set/](redis-quests/04-sorted-set/) — Sorted Set 학습 자료 5종 (실습·요약·실무·시나리오·면접질문)
 
 ### 외부 자료
 - Redis 공식 문서 (redis.io/docs) — 명령어 레퍼런스
